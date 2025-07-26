@@ -65,51 +65,53 @@ export default function TestMiniAppPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-green-50 p-8">
+    <div className="min-h-screen bg-green-50 p-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-green-800 mb-6">
-          🌱 Farcaster Mini App Test
-        </h1>
-        
         <div className="bg-white rounded-lg p-6 shadow-md space-y-4">
-          <div className="flex items-center space-x-2">
-            <div className={`w-4 h-4 rounded-full ${miniappDetected ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-            <span className="font-medium">
-              Farcaster Mini App Detected: {miniappDetected ? 'Yes' : 'No'}
-            </span>
-          </div>
+          <h1 className="text-2xl font-bold text-green-800 mb-6 text-center">
+            🌱 Farcaster Mini App Test
+          </h1>
           
-          <div className="flex items-center space-x-2">
-            <div className={`w-4 h-4 rounded-full ${readyCalled ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-            <span className="font-medium">
-              Ready Function Called: {readyCalled ? 'Yes' : 'No'}
-            </span>
-          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+              <div className={`w-4 h-4 rounded-full ${miniappDetected ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <span className="font-medium">
+                Farcaster Mini App Detected: {miniappDetected ? 'Yes' : 'No'}
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+              <div className={`w-4 h-4 rounded-full ${readyCalled ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <span className="font-medium">
+                Ready Function Called: {readyCalled ? 'Yes' : 'No'}
+              </span>
+            </div>
 
-          <div className="flex items-center space-x-2">
-            <div className={`w-4 h-4 rounded-full ${
-              manifestStatus === 'found' ? 'bg-green-500' : 
-              manifestStatus === 'not-found' ? 'bg-red-500' : 
-              'bg-yellow-500'
-            }`}></div>
-            <span className="font-medium">
-              Manifest Status: {manifestStatus === 'found' ? 'Found' : 
-                               manifestStatus === 'not-found' ? 'Not Found' : 
-                               'Checking...'}
-            </span>
-          </div>
+            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+              <div className={`w-4 h-4 rounded-full ${
+                manifestStatus === 'found' ? 'bg-green-500' : 
+                manifestStatus === 'not-found' ? 'bg-red-500' : 
+                'bg-yellow-500'
+              }`}></div>
+              <span className="font-medium">
+                Manifest Status: {manifestStatus === 'found' ? 'Found' : 
+                                 manifestStatus === 'not-found' ? 'Not Found' : 
+                                 'Checking...'}
+              </span>
+            </div>
 
-          <div className="flex items-center space-x-2">
-            <div className={`w-4 h-4 rounded-full ${
-              sdkStatus === 'ready-called' ? 'bg-green-500' : 
-              sdkStatus === 'error' ? 'bg-red-500' : 
-              'bg-yellow-500'
-            }`}></div>
-            <span className="font-medium">
-              SDK Status: {sdkStatus === 'ready-called' ? 'Ready Called' : 
-                          sdkStatus === 'error' ? 'Error' : 
-                          'Checking...'}
-            </span>
+            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+              <div className={`w-4 h-4 rounded-full ${
+                sdkStatus === 'ready-called' ? 'bg-green-500' : 
+                sdkStatus === 'error' ? 'bg-red-500' : 
+                'bg-yellow-500'
+              }`}></div>
+              <span className="font-medium">
+                SDK Status: {sdkStatus === 'ready-called' ? 'Ready Called' : 
+                            sdkStatus === 'error' ? 'Error' : 
+                            'Checking...'}
+              </span>
+            </div>
           </div>
           
           <div className="mt-6 p-4 bg-gray-100 rounded">
@@ -170,7 +172,7 @@ export default function TestMiniAppPage() {
                   setSdkStatus("error")
                 }
               }}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
             >
               Test SDK.actions.ready()
             </button>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FarcasterProvider } from "@/components/farcaster-provider";
+import { MiniAppNavigation } from "@/components/miniapp-navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,14 +17,14 @@ const geistMono = Geist_Mono({
 // Mini App configuration for Farcaster
 const miniapp = {
   version: "1",
-  imageUrl: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image",
+  imageUrl: "https://agro-qfqlwjshx-disidentes-projects.vercel.app/og-image",
   button: {
     title: "Open Agro-bootcamp",
     action: {
       type: "launch_frame",
       name: "Agro-bootcamp",
-      url: "https://agro-gy7aqkudn-disidentes-projects.vercel.app",
-      splashImageUrl: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/icon",
+      url: "https://agro-qfqlwjshx-disidentes-projects.vercel.app",
+      splashImageUrl: "https://agro-qfqlwjshx-disidentes-projects.vercel.app/icon",
       splashBackgroundColor: "#f0fdf4"
     }
   }
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     description: "Trazabilidad agrícola sobre blockchain Base L2. Hackathon Base.",
     images: [
       {
-        url: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image",
+        url: "https://agro-qfqlwjshx-disidentes-projects.vercel.app/og-image",
         width: 1200,
         height: 630,
         alt: "Agro-bootcamp - Trazabilidad agrícola sobre blockchain Base L2",
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Agro-bootcamp",
     description: "Trazabilidad agrícola sobre blockchain Base L2. Hackathon Base.",
-    images: ["https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image"],
+    images: ["https://agro-qfqlwjshx-disidentes-projects.vercel.app/og-image"],
   },
   other: {
     "fc:miniapp": JSON.stringify(miniapp),
@@ -89,7 +90,10 @@ export default function RootLayout({
       </head>
       <body className="bg-green-50 text-green-900 font-sans min-h-screen">
         <FarcasterProvider>
-          {children}
+          <MiniAppNavigation />
+          <div className="pt-16">
+            {children}
+          </div>
         </FarcasterProvider>
       </body>
     </html>
