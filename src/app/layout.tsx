@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FarcasterProvider } from "@/components/farcaster-provider";
 import { MiniAppNavigation } from "@/components/miniapp-navigation";
+import { WagmiConfigProvider } from "@/providers/wagmi-provider";
+import { AuthProvider } from "@/contexts/auth-context";
+import { AuthHeader } from "@/components/auth-header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -89,12 +92,24 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-green-50 text-green-900 font-sans min-h-screen">
-        <FarcasterProvider>
-          <MiniAppNavigation />
-          <div className="pt-16">
-            {children}
-          </div>
-        </FarcasterProvider>
+        <WagmiConfigProvider>
+          <AuthProvider>
+            <FarcasterProvider>
+              <div className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-green-200">
+                <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
+                  <div className="flex items-center space-x-4">
+                    <h1 className="text-lg font-bold text-green-800">🌱 Agro-bootcamp</h1>
+                  </div>
+                  <AuthHeader />
+                </div>
+              </div>
+              <MiniAppNavigation className="top-16" />
+              <div className="pt-32">
+                {children}
+              </div>
+            </FarcasterProvider>
+          </AuthProvider>
+        </WagmiConfigProvider>
       </body>
     </html>
   );
