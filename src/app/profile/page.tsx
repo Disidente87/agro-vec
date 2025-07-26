@@ -34,7 +34,7 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-green-50 p-4">
+      <div className="min-h-screen bg-green-50 p-4 pt-20">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header */}

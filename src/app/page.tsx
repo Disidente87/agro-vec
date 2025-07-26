@@ -45,7 +45,8 @@ export default function Home() {
             </Link>
           )}
           
-          {hasPermission('canViewAllData') && (
+          {/* Gestión de Parcelas - Solo para productores y técnicos */}
+          {(hasPermission('canCreateParcels') || hasPermission('canEditParcels')) && (
             <Link 
               href="/parcels" 
               className="btn-secondary text-center py-4 px-6 text-lg font-semibold"
@@ -54,7 +55,8 @@ export default function Home() {
             </Link>
           )}
           
-          {hasPermission('canCreateEvents') && (
+          {/* Bitácora de Eventos - Solo para productores y técnicos */}
+          {(hasPermission('canCreateEvents') || hasPermission('canEditEvents')) && (
             <Link 
               href="/events" 
               className="btn-secondary text-center py-4 px-6 text-lg font-semibold"
@@ -63,7 +65,8 @@ export default function Home() {
             </Link>
           )}
           
-          {hasPermission('canCreateBatches') && (
+          {/* Generar Lotes - Solo para productores y distribuidores */}
+          {(hasPermission('canCreateBatches') || hasPermission('canEditBatches')) && (
             <Link 
               href="/batches" 
               className="btn-secondary text-center py-4 px-6 text-lg font-semibold"
@@ -72,12 +75,15 @@ export default function Home() {
             </Link>
           )}
           
-          <Link 
-            href="/scan" 
-            className="btn-secondary text-center py-4 px-6 text-lg font-semibold"
-          >
-            📱 Escanear QR
-          </Link>
+          {/* Escanear QR - Disponible para todos los usuarios autenticados */}
+          {isAuthenticated && (
+            <Link 
+              href="/scan" 
+              className="btn-secondary text-center py-4 px-6 text-lg font-semibold"
+            >
+              📱 Escanear QR
+            </Link>
+          )}
         </div>
         
         <div className="mt-8 text-xs text-green-700">
