@@ -7,7 +7,7 @@ This guide explains how to deploy your Agro-bootcamp app to Farcaster and ensure
 ## What We've Implemented
 
 ### 1. Farcaster Frame Integration
-- ✅ Installed `frames.js` package
+- ✅ Implemented custom Farcaster integration (no external dependencies)
 - ✅ Created Farcaster provider component with `ready()` function
 - ✅ Added frame metadata to layout
 - ✅ Created API route for frame interactions
