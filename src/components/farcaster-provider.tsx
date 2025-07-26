@@ -1,80 +1,65 @@
 "use client"
 
 import { useEffect } from "react"
+import { sdk } from "@farcaster/miniapp-sdk"
 
 interface FarcasterProviderProps {
   children: React.ReactNode
 }
 
-interface FarcasterMiniAppConfig {
-  appName: string
-  appDescription: string
-  appIcon: string
-  appUrl: string
-}
-
-// Extend Window interface for Farcaster Mini App
+// Extend Window interface for fallback methods
 declare global {
   interface Window {
     farcaster?: {
       ready: () => void
     }
     ready?: () => void
-    // Mini App specific
-    FarcasterMiniApp?: {
-      init: (config: FarcasterMiniAppConfig) => void
-      ready: () => void
-    }
   }
 }
 
 export function FarcasterProvider({ children }: FarcasterProviderProps) {
   useEffect(() => {
-    // Initialize Farcaster Mini App
-    const initFarcasterMiniApp = () => {
+    // Initialize Farcaster Mini App with official SDK
+    const initFarcasterMiniApp = async () => {
       try {
-        // Method 1: Check if FarcasterMiniApp SDK is available
-        if (typeof window !== "undefined" && window.FarcasterMiniApp) {
-          const config: FarcasterMiniAppConfig = {
-            appName: "Agro-bootcamp",
-            appDescription: "Trazabilidad agrícola sobre blockchain Base L2",
-            appIcon: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/icon",
-            appUrl: "https://agro-gy7aqkudn-disidentes-projects.vercel.app"
-          }
-          window.FarcasterMiniApp.init(config)
-          window.FarcasterMiniApp.ready()
-          console.log("Farcaster Mini App initialized and ready")
-          return
-        }
-
-        // Method 2: Legacy farcaster object (for backward compatibility)
-        if (typeof window !== "undefined" && window.farcaster) {
-          window.farcaster.ready()
-          console.log("Farcaster ready called via window.farcaster")
-          return
-        }
-
-        // Method 3: Global ready function
-        if (typeof window !== "undefined" && window.ready) {
-          window.ready()
-          console.log("Farcaster ready called via window.ready")
-          return
-        }
-
-        // Method 4: Dispatch custom event
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("farcaster-ready"))
-          console.log("Farcaster ready event dispatched")
-        }
+        // Call ready() to hide the splash screen - this is the main requirement
+        await sdk.actions.ready()
+        
+        console.log("Farcaster Mini App ready() called successfully")
       } catch (error) {
-        console.error("Error initializing Farcaster Mini App:", error)
+        console.error("Error calling Farcaster Mini App ready():", error)
+        
+        // Fallback methods if SDK fails
+        try {
+          // Method 1: Legacy farcaster object
+          if (typeof window !== "undefined" && window.farcaster) {
+            window.farcaster.ready()
+            console.log("Farcaster ready called via window.farcaster (fallback)")
+            return
+          }
+
+          // Method 2: Global ready function
+          if (typeof window !== "undefined" && window.ready) {
+            window.ready()
+            console.log("Farcaster ready called via window.ready (fallback)")
+            return
+          }
+
+          // Method 3: Dispatch custom event
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("farcaster-ready"))
+            console.log("Farcaster ready event dispatched (fallback)")
+          }
+        } catch (fallbackError) {
+          console.error("Fallback methods also failed:", fallbackError)
+        }
       }
     }
 
     // Initialize immediately
     initFarcasterMiniApp()
 
-    // Also initialize after a short delay to ensure everything is loaded
+    // Also try after a short delay to ensure everything is loaded
     const timeoutId = setTimeout(initFarcasterMiniApp, 100)
 
     return () => clearTimeout(timeoutId)

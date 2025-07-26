@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@farcaster/miniapp-sdk": "^0.1.7",
     "@headlessui/react": "^2.2.6",
     "@heroicons/react": "^2.2.0",
     "@rainbow-me/rainbowkit": "^2.2.8",

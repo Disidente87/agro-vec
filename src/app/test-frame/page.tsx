@@ -1,22 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { sdk } from "@farcaster/miniapp-sdk"
 
-interface FarcasterMiniAppConfig {
-  appName: string
-  appDescription: string
-  appIcon: string
-  appUrl: string
-}
-
-// Extend Window interface for Farcaster Mini App
+// Extend Window interface for fallback methods
 declare global {
   interface Window {
     ready?: () => void
-    FarcasterMiniApp?: {
-      init: (config: FarcasterMiniAppConfig) => void
-      ready: () => void
-    }
   }
 }
 
@@ -24,6 +14,7 @@ export default function TestMiniAppPage() {
   const [readyCalled, setReadyCalled] = useState(false)
   const [miniappDetected, setMiniappDetected] = useState(false)
   const [manifestStatus, setManifestStatus] = useState("checking")
+  const [sdkStatus, setSdkStatus] = useState("checking")
 
   useEffect(() => {
     // Check if we're in a Farcaster Mini App
@@ -46,6 +37,21 @@ export default function TestMiniAppPage() {
       .catch(() => {
         setManifestStatus("error")
       })
+
+    // Test SDK functionality
+    const testSDK = async () => {
+      try {
+        await sdk.actions.ready()
+        setSdkStatus("ready-called")
+        setReadyCalled(true)
+        console.log("Farcaster SDK ready() called successfully from test page")
+      } catch (error) {
+        setSdkStatus("error")
+        console.error("Error calling Farcaster SDK ready():", error)
+      }
+    }
+
+    testSDK()
 
     // Override the ready function to track when it's called
     if (typeof window !== "undefined") {
@@ -92,6 +98,19 @@ export default function TestMiniAppPage() {
                                'Checking...'}
             </span>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <div className={`w-4 h-4 rounded-full ${
+              sdkStatus === 'ready-called' ? 'bg-green-500' : 
+              sdkStatus === 'error' ? 'bg-red-500' : 
+              'bg-yellow-500'
+            }`}></div>
+            <span className="font-medium">
+              SDK Status: {sdkStatus === 'ready-called' ? 'Ready Called' : 
+                          sdkStatus === 'error' ? 'Error' : 
+                          'Checking...'}
+            </span>
+          </div>
           
           <div className="mt-6 p-4 bg-gray-100 rounded">
             <h3 className="font-semibold mb-2">Debug Info:</h3>
@@ -112,14 +131,14 @@ export default function TestMiniAppPage() {
               {JSON.stringify({
                 "fc:miniapp": {
                   "version": "1",
-                  "imageUrl": "https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image",
+                  "imageUrl": "https://agro-qfqlwjshx-disidentes-projects.vercel.app/og-image",
                   "button": {
                     "title": "Open Agro-bootcamp",
                     "action": {
                       "type": "launch_frame",
                       "name": "Agro-bootcamp",
-                      "url": "https://agro-gy7aqkudn-disidentes-projects.vercel.app",
-                      "splashImageUrl": "https://agro-gy7aqkudn-disidentes-projects.vercel.app/icon",
+                      "url": "https://agro-qfqlwjshx-disidentes-projects.vercel.app",
+                      "splashImageUrl": "https://agro-qfqlwjshx-disidentes-projects.vercel.app/icon",
                       "splashBackgroundColor": "#f0fdf4"
                     }
                   }
@@ -135,6 +154,26 @@ export default function TestMiniAppPage() {
                 /.well-known/farcaster.json
               </a>
             </p>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="font-semibold mb-2">SDK Test:</h3>
+            <button 
+              onClick={async () => {
+                try {
+                  await sdk.actions.ready()
+                  setReadyCalled(true)
+                  setSdkStatus("ready-called")
+                  console.log("Manual SDK ready() call successful")
+                } catch (error) {
+                  console.error("Manual SDK ready() call failed:", error)
+                  setSdkStatus("error")
+                }
+              }}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Test SDK.actions.ready()
+            </button>
           </div>
         </div>
       </div>
