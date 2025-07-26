@@ -11,6 +11,12 @@ interface AuthModalProps {
   onClose: () => void
 }
 
+// Email validation function
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isRegistering, setIsRegistering] = useState(false)
   const [selectedRole, setSelectedRole] = useState<UserRole>('consumer')
@@ -19,6 +25,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     email: '',
     organization: '',
   })
+  const [emailError, setEmailError] = useState('')
 
   const { address, isConnected } = useAccount()
   const { connect, connectors } = useConnect()
@@ -42,6 +49,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const handleRegister = async () => {
     if (!address || !formData.name) return
 
+    // Validate email if provided
+    if (formData.email && !isValidEmail(formData.email)) {
+      setEmailError('Por favor ingresa un email válido')
+      return
+    }
+
     const signature = await signMessage()
     if (signature) {
       await register({
@@ -59,6 +72,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const handleFormChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+    
+    // Clear email error when user starts typing
+    if (field === 'email') {
+      setEmailError('')
+    }
   }
 
   if (!isOpen) return null
@@ -133,41 +151,46 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Nombre *
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleFormChange('name', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                     placeholder="Tu nombre completo"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Email
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleFormChange('email', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500 ${
+                      emailError ? 'border-red-300' : 'border-gray-300'
+                    }`}
                     placeholder="tu@email.com"
                   />
+                  {emailError && (
+                    <p className="text-sm text-red-600 mt-1">{emailError}</p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Organización
                   </label>
                   <input
                     type="text"
                     value={formData.organization}
                     onChange={(e) => handleFormChange('organization', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                     placeholder="Nombre de tu organización"
                   />
                 </div>
@@ -175,7 +198,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               {/* Role Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-900 mb-3">
                   Selecciona tu rol *
                 </label>
                 <div className="space-y-2">
@@ -217,7 +240,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {isRegistering ? (
                 <button
                   onClick={handleRegister}
-                  disabled={isLoading || !formData.name}
+                  disabled={isLoading || !formData.name || Boolean(emailError)}
                   className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
                   {isLoading ? 'Registrando...' : 'Registrarse'}

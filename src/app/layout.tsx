@@ -6,6 +6,7 @@ import { MiniAppNavigation } from "@/components/miniapp-navigation";
 import { WagmiConfigProvider } from "@/providers/wagmi-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { AuthHeader } from "@/components/auth-header";
+import { ConditionalNavigation } from "@/components/conditional-navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -103,8 +104,8 @@ export default function RootLayout({
                   <AuthHeader />
                 </div>
               </div>
-              <MiniAppNavigation className="top-16" />
-              <div className="pt-32">
+              <ConditionalNavigation />
+              <div className="pt-16">
                 {children}
               </div>
             </FarcasterProvider>
