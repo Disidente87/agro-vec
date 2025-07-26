@@ -13,6 +13,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Mini App configuration for Farcaster
+const miniapp = {
+  version: "1",
+  imageUrl: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image",
+  button: {
+    title: "Open Agro-bootcamp",
+    action: {
+      type: "launch_frame",
+      name: "Agro-bootcamp",
+      url: "https://agro-gy7aqkudn-disidentes-projects.vercel.app",
+      splashImageUrl: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/icon",
+      splashBackgroundColor: "#f0fdf4"
+    }
+  }
+}
+
 export const metadata: Metadata = {
   title: "Agro-bootcamp",
   description: "Trazabilidad agrícola sobre blockchain Base L2. Hackathon Base.",
@@ -22,7 +38,7 @@ export const metadata: Metadata = {
     description: "Trazabilidad agrícola sobre blockchain Base L2. Hackathon Base.",
     images: [
       {
-        url: "https://agro-bootcamp.vercel.app/og-image",
+        url: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image",
         width: 1200,
         height: 630,
         alt: "Agro-bootcamp - Trazabilidad agrícola sobre blockchain Base L2",
@@ -33,13 +49,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Agro-bootcamp",
     description: "Trazabilidad agrícola sobre blockchain Base L2. Hackathon Base.",
-    images: ["https://agro-bootcamp.vercel.app/og-image"],
+    images: ["https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image"],
   },
   other: {
-    "fc:frame": "vNext",
-    "fc:frame:image": "https://agro-bootcamp.vercel.app/og-image",
-    "fc:frame:button:1": "Ir al Dashboard",
-    "fc:frame:post_url": "https://agro-bootcamp.vercel.app/api/frame",
+    "fc:miniapp": JSON.stringify(miniapp),
   },
 };
 

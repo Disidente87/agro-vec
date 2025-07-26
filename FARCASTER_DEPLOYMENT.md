@@ -1,17 +1,17 @@
-# 🌱 Farcaster Deployment Guide - Agro-bootcamp
+# 🌱 Farcaster Mini App Deployment Guide - Agro-bootcamp
 
 ## Overview
 
-This guide explains how to deploy your Agro-bootcamp app to Farcaster and ensure it appears correctly in the preview.
+This guide explains how to deploy your Agro-bootcamp app as a Farcaster Mini App and ensure it appears correctly in the preview.
 
 ## What We've Implemented
 
-### 1. Farcaster Frame Integration
-- ✅ Implemented custom Farcaster integration (no external dependencies)
+### 1. Farcaster Mini App Integration
+- ✅ Implemented custom Farcaster Mini App integration (no external dependencies)
 - ✅ Created Farcaster provider component with `ready()` function
-- ✅ Added frame metadata to layout
-- ✅ Created API route for frame interactions
-- ✅ Generated dynamic OG image for frames
+- ✅ Added Mini App metadata to layout
+- ✅ Created manifest file at `/.well-known/farcaster.json`
+- ✅ Generated dynamic OG image and icon for Mini App
 
 ### 2. Key Components
 
@@ -19,31 +19,37 @@ This guide explains how to deploy your Agro-bootcamp app to Farcaster and ensure
 ```typescript
 // Handles the ready() function call that Farcaster requires
 useEffect(() => {
-  const callReady = () => {
-    // Multiple methods to call ready
-    if (window.farcaster) window.farcaster.ready()
-    if (window.ready) window.ready()
-    window.dispatchEvent(new CustomEvent("farcaster-ready"))
+  const initFarcasterMiniApp = () => {
+    // Multiple methods to initialize Mini App
+    if (window.FarcasterMiniApp) {
+      window.FarcasterMiniApp.init(config)
+      window.FarcasterMiniApp.ready()
+    }
   }
-  callReady()
+  initFarcasterMiniApp()
 }, [])
 ```
 
-#### Frame API Route (`src/app/api/frame/route.ts`)
-```typescript
-// Handles Farcaster frame interactions
-export async function POST(request: NextRequest) {
-  // Process frame interactions and return responses
+#### Mini App Manifest (`public/.well-known/farcaster.json`)
+```json
+{
+  "accountAssociation": {
+    "header": "...",
+    "payload": "...",
+    "signature": "..."
+  },
+  "frame": {
+    "version": "1",
+    "name": "Agro-bootcamp",
+    "iconUrl": "https://...",
+    "homeUrl": "https://..."
+  }
 }
 ```
 
-#### Dynamic OG Image (`src/app/og-image/route.tsx`)
-```typescript
-// Generates the image displayed in Farcaster frames
-export async function GET() {
-  return new ImageResponse(/* JSX for the image */)
-}
-```
+#### Dynamic Images
+- **OG Image**: `/og-image` (1200x630) for previews
+- **Icon**: `/icon` (200x200) for splash screen
 
 ## Deployment Steps
 
@@ -60,32 +66,30 @@ vercel --prod
 ```
 
 ### 2. Verify Your Domain
-Ensure your app is deployed at: `https://agro-bootcamp.vercel.app`
+Ensure your app is deployed at: `https://agro-gy7aqkudn-disidentes-projects.vercel.app`
 
-### 3. Test Farcaster Integration
-Visit: `https://agro-bootcamp.vercel.app/test-frame`
+### 3. Test Mini App Integration
+Visit: `https://agro-gy7aqkudn-disidentes-projects.vercel.app/test-frame`
 
 This page will show:
-- ✅ Farcaster Frame Detection
+- ✅ Farcaster Mini App Detection
 - ✅ Ready Function Status
+- ✅ Manifest Status
 - ✅ Debug Information
-- ✅ Frame Metadata
+- ✅ Mini App Metadata
 
 ### 4. Submit to Farcaster
 1. Go to [Farcaster Developer Portal](https://developer.farcaster.xyz/)
-2. Create a new Frame
-3. Use your app URL: `https://agro-bootcamp.vercel.app`
-4. The frame metadata will be automatically detected
+2. Create a new Mini App
+3. Use your app URL: `https://agro-gy7aqkudn-disidentes-projects.vercel.app`
+4. The manifest will be automatically detected at `/.well-known/farcaster.json`
 
-## Frame Metadata
+## Mini App Metadata
 
-Your app includes these frame metadata tags:
+Your app includes these Mini App metadata tags:
 
 ```html
-<meta property="fc:frame" content="vNext" />
-<meta property="fc:frame:image" content="https://agro-bootcamp.vercel.app/og-image" />
-<meta property="fc:frame:button:1" content="Ir al Dashboard" />
-<meta property="fc:frame:post_url" content="https://agro-bootcamp.vercel.app/api/frame" />
+<meta name="fc:miniapp" content='{"version":"1","imageUrl":"...","button":{...}}' />
 ```
 
 ## Troubleshooting
@@ -95,6 +99,7 @@ Your app includes these frame metadata tags:
 
 1. **Check Console**: Open browser dev tools and look for:
    ```
+   "Farcaster Mini App initialized and ready"
    "Farcaster ready called via window.farcaster"
    "Farcaster ready called via window.ready"
    "Farcaster ready event dispatched"
@@ -102,20 +107,21 @@ Your app includes these frame metadata tags:
 
 2. **Test Page**: Visit `/test-frame` to verify integration
 
-3. **Verify Metadata**: Check that frame metadata is present in page source
+3. **Verify Manifest**: Check that manifest is accessible at `/.well-known/farcaster.json`
 
-### Issue: Frame Not Responding
-**Solution**: The API route handles both GET and POST requests:
+### Issue: Manifest Not Found
+**Solution**: The manifest file is created at `public/.well-known/farcaster.json`:
 
-- **GET**: Returns frame metadata
-- **POST**: Handles user interactions and returns new frame state
+- **URL**: `https://agro-gy7aqkudn-disidentes-projects.vercel.app/.well-known/farcaster.json`
+- **Content**: Valid JSON with accountAssociation and frame objects
+- **Status**: Should return HTTP 200
 
-### Issue: Image Not Loading
-**Solution**: The dynamic OG image route generates images on-demand:
+### Issue: Images Not Loading
+**Solution**: The dynamic image routes generate images on-demand:
 
-- URL: `https://agro-bootcamp.vercel.app/og-image`
-- Format: 1200x630 PNG
-- Content: Agro-bootcamp branding with buttons
+- **OG Image**: `https://agro-gy7aqkudn-disidentes-projects.vercel.app/og-image`
+- **Icon**: `https://agro-gy7aqkudn-disidentes-projects.vercel.app/icon`
+- **Format**: Proper aspect ratios for Mini App requirements
 
 ## Performance Optimization
 
@@ -123,15 +129,16 @@ Your app includes these frame metadata tags:
 - ✅ **Minimal Loading Time**: Optimized build with Next.js 15
 - ✅ **No Content Reflow**: Ready function called after interface loads
 - ✅ **Skeleton States**: Implemented in components
-- ✅ **Image Optimization**: Dynamic OG images with proper sizing
+- ✅ **Image Optimization**: Dynamic images with proper sizing
 
 ### Farcaster-Specific Optimizations
 - ✅ **Early Ready Call**: Called as soon as interface is ready
-- ✅ **Multiple Fallbacks**: Three different methods to call ready
+- ✅ **Multiple Fallbacks**: Four different methods to call ready
 - ✅ **Error Handling**: Graceful fallbacks if ready function fails
 - ✅ **Debug Logging**: Console logs for troubleshooting
+- ✅ **Manifest Validation**: Automatic manifest status checking
 
-## Testing Your Frame
+## Testing Your Mini App
 
 ### 1. Local Testing
 ```bash
@@ -140,12 +147,13 @@ npm run dev
 ```
 
 ### 2. Production Testing
-- Visit: `https://agro-bootcamp.vercel.app/test-frame`
+- Visit: `https://agro-gy7aqkudn-disidentes-projects.vercel.app/test-frame`
 - Check browser console for ready function logs
-- Verify frame metadata in page source
+- Verify manifest is accessible
+- Verify Mini App metadata in page source
 
 ### 3. Farcaster Testing
-- Use Farcaster's frame validator
+- Use Farcaster's Mini App validator
 - Test in Warpcast app
 - Verify preview appears correctly
 
@@ -153,10 +161,10 @@ npm run dev
 
 Once deployed and working:
 
-1. **Customize Frame Actions**: Modify `/api/frame/route.ts` to handle specific user interactions
-2. **Add More Buttons**: Extend frame metadata with additional action buttons
-3. **Implement State Management**: Add frame state persistence
-4. **Analytics**: Track frame interactions and user engagement
+1. **Customize Mini App Actions**: Modify the manifest to handle specific user interactions
+2. **Add More Features**: Extend Mini App capabilities with additional functionality
+3. **Implement State Management**: Add Mini App state persistence
+4. **Analytics**: Track Mini App interactions and user engagement
 
 ## Support
 
@@ -164,7 +172,7 @@ If you encounter issues:
 
 1. Check the test page: `/test-frame`
 2. Review browser console logs
-3. Verify frame metadata in page source
-4. Test with Farcaster's frame validator
+3. Verify manifest accessibility: `/.well-known/farcaster.json`
+4. Test with Farcaster's Mini App validator
 
-The implementation follows Farcaster's best practices and should resolve the preview issue you were experiencing. 
+The implementation follows Farcaster's Mini App best practices and should resolve the preview issue you were experiencing. 

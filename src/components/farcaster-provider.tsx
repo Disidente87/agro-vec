@@ -6,51 +6,76 @@ interface FarcasterProviderProps {
   children: React.ReactNode
 }
 
-// Extend Window interface for Farcaster
+interface FarcasterMiniAppConfig {
+  appName: string
+  appDescription: string
+  appIcon: string
+  appUrl: string
+}
+
+// Extend Window interface for Farcaster Mini App
 declare global {
   interface Window {
     farcaster?: {
       ready: () => void
     }
     ready?: () => void
+    // Mini App specific
+    FarcasterMiniApp?: {
+      init: (config: FarcasterMiniAppConfig) => void
+      ready: () => void
+    }
   }
 }
 
 export function FarcasterProvider({ children }: FarcasterProviderProps) {
   useEffect(() => {
-    // Call ready when the interface is ready to be displayed
-    // This is required for Farcaster to show the preview
-    const callReady = () => {
+    // Initialize Farcaster Mini App
+    const initFarcasterMiniApp = () => {
       try {
-        // Method 1: Check if farcaster object exists on window
+        // Method 1: Check if FarcasterMiniApp SDK is available
+        if (typeof window !== "undefined" && window.FarcasterMiniApp) {
+          const config: FarcasterMiniAppConfig = {
+            appName: "Agro-bootcamp",
+            appDescription: "Trazabilidad agrícola sobre blockchain Base L2",
+            appIcon: "https://agro-gy7aqkudn-disidentes-projects.vercel.app/icon",
+            appUrl: "https://agro-gy7aqkudn-disidentes-projects.vercel.app"
+          }
+          window.FarcasterMiniApp.init(config)
+          window.FarcasterMiniApp.ready()
+          console.log("Farcaster Mini App initialized and ready")
+          return
+        }
+
+        // Method 2: Legacy farcaster object (for backward compatibility)
         if (typeof window !== "undefined" && window.farcaster) {
           window.farcaster.ready()
           console.log("Farcaster ready called via window.farcaster")
           return
         }
 
-        // Method 2: Check if ready function exists directly on window
+        // Method 3: Global ready function
         if (typeof window !== "undefined" && window.ready) {
           window.ready()
           console.log("Farcaster ready called via window.ready")
           return
         }
 
-        // Method 3: Dispatch a custom event that Farcaster might listen for
+        // Method 4: Dispatch custom event
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("farcaster-ready"))
           console.log("Farcaster ready event dispatched")
         }
       } catch (error) {
-        console.error("Error calling Farcaster ready:", error)
+        console.error("Error initializing Farcaster Mini App:", error)
       }
     }
 
-    // Call ready immediately
-    callReady()
+    // Initialize immediately
+    initFarcasterMiniApp()
 
-    // Also call ready after a short delay to ensure everything is loaded
-    const timeoutId = setTimeout(callReady, 100)
+    // Also initialize after a short delay to ensure everything is loaded
+    const timeoutId = setTimeout(initFarcasterMiniApp, 100)
 
     return () => clearTimeout(timeoutId)
   }, [])
