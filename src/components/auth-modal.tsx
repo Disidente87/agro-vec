@@ -64,7 +64,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         email: formData.email || undefined,
         organization: formData.organization || undefined,
         signature,
-        message: 'Agro-bootcamp Registration'
+        message: 'Agro-bootcamp Authentication'
       })
       onClose()
     }

@@ -3,6 +3,7 @@
 import { createContext, useContext, useReducer, useEffect, ReactNode } from "react"
 import { useAccount, useSignMessage } from "wagmi"
 import { AuthState, User, UserRole, LoginCredentials, RegisterData, ROLE_PERMISSIONS } from "@/types/auth"
+import { AuthService } from "@/services/auth-service"
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>
@@ -59,36 +60,50 @@ const initialState: AuthState = {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState)
-  const { address, isConnected } = useAccount()
+  const { address } = useAccount()
   const { signMessageAsync } = useSignMessage()
 
   // Check for existing session on mount
   useEffect(() => {
     const checkSession = async () => {
-      const session = localStorage.getItem('agro-session')
-      if (session && address) {
-        try {
-          const userData = JSON.parse(session)
-          if (userData.address === address) {
-            dispatch({ type: 'SET_USER', payload: userData })
-          } else {
-            localStorage.removeItem('agro-session')
-          }
-        } catch (error) {
-          localStorage.removeItem('agro-session')
+      dispatch({ type: 'SET_LOADING', payload: true })
+      
+      try {
+        const user = await AuthService.getCurrentUser()
+        if (user) {
+          dispatch({ type: 'SET_USER', payload: user })
         }
+      } catch (error) {
+        console.error('Error checking session:', error)
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false })
       }
     }
 
     checkSession()
-  }, [address])
+
+    // Listen to auth state changes
+    const { data: { subscription } } = AuthService.onAuthStateChange((user) => {
+      if (user) {
+        dispatch({ type: 'SET_USER', payload: user })
+      } else {
+        dispatch({ type: 'LOGOUT' })
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   const signMessage = async (): Promise<string | null> => {
-    if (!address) return null
+    if (!address) {
+      return null
+    }
 
     try {
-      const message = `Agro-bootcamp Authentication\n\nAddress: ${address}\nTimestamp: ${Date.now()}\n\nPlease sign this message to authenticate with Agro-bootcamp.`
+      const message = 'Agro-bootcamp Authentication'
+      
       const signature = await signMessageAsync({ message })
+      
       return signature
     } catch (error) {
       console.error('Error signing message:', error)
@@ -100,24 +115,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_LOADING', payload: true })
     
     try {
-      // In a real app, you would verify the signature on the server
-      // For now, we'll simulate authentication
-      const mockUser: User = {
-        id: credentials.address,
-        address: credentials.address,
-        role: 'consumer', // Default role, would be fetched from server
-        name: 'Usuario',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isActive: true,
+      const signature = await signMessage()
+      if (!signature) {
+        throw new Error('Failed to sign message')
       }
 
-      // Store session
-      localStorage.setItem('agro-session', JSON.stringify(mockUser))
-      
-      dispatch({ type: 'SET_USER', payload: mockUser })
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Error al iniciar sesión' })
+      const { user, error } = await AuthService.signInWithWallet(
+        credentials.address,
+        signature,
+        credentials.message || 'Agro-bootcamp Authentication'
+      )
+
+      if (error) {
+        throw error
+      }
+
+      if (user) {
+        const userProfile = await AuthService.getCurrentUser()
+        if (userProfile) {
+          dispatch({ type: 'SET_USER', payload: userProfile })
+        }
+      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión'
+      dispatch({ type: 'SET_ERROR', payload: errorMessage })
     }
   }
 
@@ -125,32 +146,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_LOADING', payload: true })
     
     try {
-      // In a real app, you would send this to your server
-      // For now, we'll simulate registration
-      const newUser: User = {
-        id: data.address,
-        address: data.address,
-        role: data.role,
-        name: data.name,
-        email: data.email,
-        organization: data.organization,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isActive: true,
+      const signature = await signMessage()
+      
+      if (!signature) {
+        throw new Error('Failed to sign message')
       }
 
-      // Store session
-      localStorage.setItem('agro-session', JSON.stringify(newUser))
-      
-      dispatch({ type: 'SET_USER', payload: newUser })
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Error al registrarse' })
+      const { user, error } = await AuthService.registerUser({
+        ...data,
+        signature,
+        message: data.message || 'Agro-bootcamp Authentication'
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (user) {
+        const userProfile = await AuthService.getCurrentUser()
+        if (userProfile) {
+          dispatch({ type: 'SET_USER', payload: userProfile })
+        }
+      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al registrarse'
+      dispatch({ type: 'SET_ERROR', payload: errorMessage })
     }
   }
 
-  const logout = () => {
-    localStorage.removeItem('agro-session')
-    dispatch({ type: 'LOGOUT' })
+  const logout = async () => {
+    try {
+      await AuthService.signOut()
+      dispatch({ type: 'LOGOUT' })
+    } catch (error) {
+      console.error('Error logging out:', error)
+    }
   }
 
   const hasPermission = (permission: keyof typeof ROLE_PERMISSIONS.producer): boolean => {
