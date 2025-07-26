@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useReducer, useEffect, ReactNode } from "react"
 import { useAccount, useSignMessage } from "wagmi"
-import { AuthState, User, UserRole, LoginCredentials, RegisterData, ROLE_PERMISSIONS } from "@/types/auth"
+import { AuthState, User, LoginCredentials, RegisterData, ROLE_PERMISSIONS } from "@/types/auth"
 import { AuthService } from "@/services/auth-service"
 
 interface AuthContextType extends AuthState {

@@ -2,21 +2,21 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FarcasterProvider } from "@/components/farcaster-provider";
-import { MiniAppNavigation } from "@/components/miniapp-navigation";
 import { WagmiConfigProvider } from "@/providers/wagmi-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { AuthHeader } from "@/components/auth-header";
 import { ConditionalNavigation } from "@/components/conditional-navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Fonts configured but not currently used in body className
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
 
 // Mini App configuration for Farcaster
 const miniapp = {

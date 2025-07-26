@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 
 // Página de gestión de parcelas
 const ParcelsPage: React.FC = () => {

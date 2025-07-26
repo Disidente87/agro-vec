@@ -2,7 +2,7 @@ import { getSupabaseClient } from '@/lib/supabase'
 import { User, RegisterData } from '@/types/auth'
 
 // SHA-256 hash function compatible with browser and Node
-function shortHash(input: string): string {
+async function shortHash(input: string): Promise<string> {
   if (typeof window !== 'undefined' && window.crypto?.subtle) {
     // Browser: use SubtleCrypto
     // This is async, but we need sync for this use case
@@ -11,8 +11,7 @@ function shortHash(input: string): string {
   // Node.js or fallback: use crypto-browserify (should be installed)
   // If not available, fallback to a simple hash (not cryptographically secure)
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const crypto = require('crypto')
+    const crypto = await import('crypto')
     return crypto.createHash('sha256').update(input).digest('hex').slice(0, 32)
   } catch {
     // Fallback: simple hash (not secure, but avoids crash)

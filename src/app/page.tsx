@@ -4,13 +4,8 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 
 export default function Home() {
-  // DEBUG TEMPORAL - Verificar variables de entorno
-  console.log('🔍 DEBUG - Variables de entorno:');
-  console.log('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-  console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Existe' : '❌ No existe');
-  console.log('🔍 FIN DEBUG');
-  
-  const { user, isAuthenticated, hasPermission } = useAuth();
+
+  const { isAuthenticated, hasPermission } = useAuth();
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-green-50 to-green-200 p-4">
